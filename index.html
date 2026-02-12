@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>University - Student Management</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 20px;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        h1,
+        h2 {
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .form-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        input[type="number"] {
+            width: 100%;
+            max-width: 320px;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 16px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        button.delete {
+            background: #e74c3c;
+        }
+
+        button.delete:hover {
+            background: #c0392b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #34495e;
+            color: white;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .message {
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        #searchInput {
+            width: 300px;
+            padding: 10px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Суралцагчид </h1>
+        <!-- Search -->
+        <div style="margin-bottom: 24px;">
+            <input type="text" id="searchInput" placeholder="Нэр эсвэл овогоор хайх..." />
+            <button onclick="searchStudents()">Хайх</button>
+            <button onclick="loadStudents()">Бүгдийг харах</button>
+        </div>
+
+        <!-- Messages -->
+        <div id="message" class="message" style="display:none;"></div>
+
+        <!-- Шинэ оюутан нэмэх маягт -->
+        <div class="form-section">
+            <h2>Add New Student</h2>
+            <form id="addForm">
+                <div class="form-group">
+                    <label>Нэр *</label>
+                    <input type="text" id="FName" required>
+                </div>
+                <div class="form-group">
+                    <label>Овог *</label>
+                    <input type="text" id="Lname" required>
+                </div>
+                <div class="form-group">
+                    <label>Төрсөн огноо</label>
+                    <input type="date" id="dob">
+                </div>
+                <div class="form-group">
+                    <label>Имэйл *</label>
+                    <input type="email" id="Email" required>
+                </div>
+                <div class="form-group">
+                    <label>Хаяг</label>
+                    <input type="text" id="Address">
+                </div>
+                <div class="form-group">
+                    <label>ЭЕШ оноо</label>
+                    <input type="number" id="enrollment_score" step="0.01" min="0" max="100">
+                </div>
+                <button type="submit">Оюутан нэмэх</button>
+            </form>
+        </div>
+
+        <!-- Оюутны мэдээлэл өөрчлөх маягт -->
+        <div class="form-section">
+            <h2>Update Student</h2>
+            <form id="updateForm">
+                <div class="form-group">
+                    <label>Student ID *</label>
+                    <input type="number" id="updateId" required>
+                </div>
+                <div class="form-group">
+                    <label>Нэр</label>
+                    <input type="text" id="updateFName">
+                </div>
+                <div class="form-group">
+                    <label>Овог</label>
+                    <input type="text" id="updateLname">
+                </div>
+                <div class="form-group">
+                    <label>Имэйл</label>
+                    <input type="email" id="updateEmail">
+                </div>
+                <button type="submit">Шинэчлэх</button>
+            </form>
+        </div>
+
+        <!-- Оюутны жагсаалт хүснэгт -->
+        <h2> Оюутны жагсаалт </h2>
+        <table id="studentsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Нэр</th>
+                    <th>Овог</th>
+                    <th>Төрсөн огноо</th>
+                    <th>Имэйл</th>
+                    <th>Хаяг</th>
+                    <th>ЭЕШ оноо</th>
+                    <th>Үйлдэл</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_BASE = '/api/students';
+        const messageDiv = document.getElementById('message');
+
+        function showMessage(text, isError = false) {
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + (isError ? 'error' : 'success');
+            messageDiv.style.display = 'block';
+            setTimeout(() => { messageDiv.style.display = 'none'; }, 5000);
+        }
+
+        async function loadStudents() {
+            try {
+                const res = await fetch(API_BASE);
+                if (!res.ok) throw new Error('Failed to load students');
+                const students = await res.json();
+
+                const tbody = document.querySelector('#studentsTable tbody');
+                tbody.innerHTML = '';
+
+                students.forEach(student => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${student.studentid}</td>
+                    <td>${student.fname || '-'}</td>
+                    <td>${student.lname || '-'}</td>
+                    <td>${student.dob ? new Date(student.dob).toLocaleDateString() : '-'}</td>
+                    <td>${student.email || '-'}</td>
+                    <td>${student.address || '-'}</td>
+                    <td>${student.enrollment_score != null ? student.enrollment_score : '-'}</td>
+                    <td>
+                        <button onclick="deleteStudent(${student.studentid})" class="delete">Устгах</button>
+                    </td>
+                `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                showMessage('Error loading students: ' + err.message, true);
+            }
+        }
+
+        async function searchStudents() {
+            const name = document.getElementById('searchInput').value.trim();
+            if (!name) {
+                loadStudents();
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/search?name=${encodeURIComponent(name)}`);
+                if (!res.ok) throw new Error('Хайлт амжилтгүй боллоо');
+                const students = await res.json();
+
+                const tbody = document.querySelector('#studentsTable tbody');
+                tbody.innerHTML = '';
+
+                if (students.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8">Оюутан олдсонгүй</td></tr>';
+                    return;
+                }
+
+                students.forEach(student => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${student.studentid}</td>
+                    <td>${student.fname || '-'}</td>
+                    <td>${student.lname || '-'}</td>
+                    <td>${student.dob ? new Date(student.dob).toLocaleDateString() : '-'}</td>
+                    <td>${student.email || '-'}</td>
+                    <td>${student.address || '-'}</td>
+                    <td>${student.enrollment_score != null ? student.enrollment_score : '-'}</td>
+                    <td>
+                        <button onclick="deleteStudent(${student.studentid})" class="delete">Delete</button>
+                    </td>
+                `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                showMessage('Хайлтын алдаа: ' + err.message, true);
+            }
+        }
+
+        // Шинэ оюутан нэмэх
+        document.getElementById('addForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                FName: document.getElementById('FName').value.trim(),
+                Lname: document.getElementById('Lname').value.trim(),
+                dob: document.getElementById('dob').value || null,
+                Email: document.getElementById('Email').value.trim(),
+                Address: document.getElementById('Address').value.trim() || null,
+                enrollment_score: document.getElementById('enrollment_score').value || null
+            };
+
+            try {
+                const res = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || 'оюутан нэмэхэд алдаа гарлаа');
+                }
+
+                showMessage('Оюутан амжилттай нэмэгдлээ!');
+                document.getElementById('addForm').reset();
+                loadStudents();
+            } catch (err) {
+                showMessage(err.message, true);
+            }
+        });
+
+        // Оюутны мэдээлэл өөрчлөх
+        document.getElementById('updateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('updateId').value;
+            if (!id) return showMessage('Оюутны ID оруулна уу', true);
+            const data = {};
+            const fname = document.getElementById('updateFName').value.trim();
+            const lname = document.getElementById('updateLname').value.trim();
+            const email = document.getElementById('updateEmail').value.trim();
+            if (fname) data.FName = fname;
+            if (lname) data.Lname = lname;
+            if (email) data.Email = email;
+            if (Object.keys(data).length === 0) {
+                return showMessage('No fields to update', true);
+            }
+            try {
+                const res = await fetch(`${API_BASE}/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || 'Failed to update');
+                }
+                showMessage('Оюутан амжилттай шинэчлэгдлээ!');
+                document.getElementById('updateForm').reset();
+                loadStudents();
+            } catch (err) {
+                showMessage(err.message, true);
+            }
+        });
+
+        // Оюутны мэдээлэл устгах
+        async function deleteStudent(id) {
+            if (!confirm('Are you sure you want to delete this student?')) return;
+            try {
+                const res = await fetch(`${API_BASE}/${id}`, { method: 'DELETE' });
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || 'Failed to delete');
+                }
+                showMessage('Оюутан амжилттай устгагдлаа');
+                loadStudents();
+            } catch (err) {
+                showMessage(err.message, true);
+            }
+        }
+
+        // Load students when page opens
+        loadStudents();
+    </script>
+</body>
+
+</html>
